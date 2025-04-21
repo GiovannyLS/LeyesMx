@@ -95,4 +95,8 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.03.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+
+    implementation("androidx.compose.material:material-icons-extended")
+
+    implementation("com.google.accompanist:accompanist-navigation-animation:0.34.0")
 }
