@@ -6,8 +6,8 @@ import com.example.leyesmx.ui.theme.LeyesMxTheme
 
 @Preview(showBackground = true)
 @Composable
-fun VistaPrevia() {
+fun PreviewPantalla() {
     LeyesMxTheme {
-        Pantalla("Constitución")
+        Pantalla("Constitución Mexicana")
     }
 }

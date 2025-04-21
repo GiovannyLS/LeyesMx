@@ -12,13 +12,16 @@ fun Pantalla(titulo: String) {
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
             text = titulo,
             style = MaterialTheme.typography.headlineMedium
         )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("Contenido de: $titulo")
+        Divider()
+        Text(
+            text = "Aquí irá el contenido completo sobre \"$titulo\". Puedes mostrar artículos, listas, o enlaces relevantes.",
+            style = MaterialTheme.typography.bodyLarge
+        )
     }
 }

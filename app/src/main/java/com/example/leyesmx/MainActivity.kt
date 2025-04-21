@@ -1,4 +1,6 @@
 package com.example.leyesmx
+import com.example.leyesmx.screens.NoticiasScreen
+import com.example.leyesmx.ui.screens.InfoPantalla
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -23,6 +25,7 @@ import androidx.compose.animation.*
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.res.painterResource
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,10 +71,30 @@ fun LeyesMxApp() {
             composable("menu") { MainMenu(navController) }
             composable("constitucion") { Pantalla("Constitución Mexicana") }
             composable("transito") { Pantalla("Reglamento de Tránsito") }
-            composable("multas") { Pantalla("Multas") }
-            composable("verificacion") { Pantalla("Verificación Vehicular") }
-            composable("tenencia") { Pantalla("Pago de Tenencia") }
-            composable("noticias") { Pantalla("Noticias Legales") }
+            composable("tenencia") {
+                InfoPantalla(
+                    titulo = "Pago de Tenencia",
+                    descripcion = "La tenencia es un impuesto que se paga anualmente por el uso de vehículos. Se puede pagar en línea o en las oficinas de finanzas de tu estado.",
+                    icon = painterResource(id = R.drawable.ic_tenencia)
+                )
+            }
+
+            composable("verificacion") {
+                InfoPantalla(
+                    titulo = "Verificación Vehicular",
+                    descripcion = "La verificación es obligatoria para reducir emisiones contaminantes. Consulta tu calendario y verifica tu vehículo según tu terminación de placa.",
+                    icon = painterResource(id = R.drawable.ic_verificacion)
+                )
+            }
+
+            composable("multas") {
+                InfoPantalla(
+                    titulo = "Multas",
+                    descripcion = "Consulta si tienes multas pendientes y realiza su pago a tiempo para evitar recargos. Puedes hacerlo en línea o en ventanilla.",
+                    icon = painterResource(id = R.drawable.ic_multas)
+                )
+            }
+            composable("noticias") { NoticiasScreen() }
         }
     }
 }

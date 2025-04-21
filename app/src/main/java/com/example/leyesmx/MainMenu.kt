@@ -10,62 +10,78 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+
+import androidx.navigation.NavHostController
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
 
 @Composable
-fun MainMenu(navController: NavController) {
+fun MainMenu(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        MenuCard("Constitución Mexicana", Icons.Default.Description) {
+        Text(
+            text = "Bienvenido a LeyesMX",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        MenuCard("Constitución Mexicana", Icons.Default.Description, Color(0xFF4CAF50)) {
             navController.navigate("constitucion")
         }
-        MenuCard("Reglamento de Tránsito", Icons.Default.DirectionsCar) {
+        MenuCard("Reglamento de Tránsito", Icons.Default.DirectionsCar, Color(0xFF2196F3)) {
             navController.navigate("transito")
         }
-        MenuCard("Multas", Icons.Default.Money) {
+        MenuCard("Multas", Icons.Default.AttachMoney, Color(0xFFF44336)) {
             navController.navigate("multas")
         }
-        MenuCard("Verificación Vehicular", Icons.Default.CheckCircle) {
+        MenuCard("Verificación Vehicular", Icons.Default.Build, Color(0xFFFF9800)) {
             navController.navigate("verificacion")
         }
-        MenuCard("Pago de Tenencia", Icons.Default.Receipt) {
+        MenuCard("Pago de Tenencia", Icons.Default.ReceiptLong, Color(0xFF9C27B0)) {
             navController.navigate("tenencia")
         }
-        MenuCard("Noticias Legales", Icons.Default.Article) {
+        MenuCard("Noticias Legales", Icons.Default.Article, Color(0xFF3F51B5)) {
             navController.navigate("noticias")
         }
     }
 }
 
 @Composable
-fun MenuCard(title: String, icon: ImageVector, onClick: () -> Unit) {
+fun MenuCard(
+    title: String,
+    icon: ImageVector,
+    backgroundColor: Color,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(80.dp)
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(8.dp)
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = backgroundColor)
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .padding(horizontal = 16.dp)
                 .fillMaxSize()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = icon,
-                contentDescription = title,
-                tint = MaterialTheme.colorScheme.primary,
+                contentDescription = null,
+                tint = Color.White,
                 modifier = Modifier.size(32.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White
             )
         }
     }
