@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "780617699835",
+    "project_id": "leyesmx-704d1",
+    "storage_bucket": "leyesmx-704d1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:780617699835:android:05dce10fb06e4f32b83b5e",
+        "android_client_info": {
+          "package_name": "com.example.leyesmx"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNV-tZisSoxixTDvCxLJt041xpU6k6qyo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
