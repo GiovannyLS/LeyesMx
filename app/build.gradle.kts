@@ -99,4 +99,21 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     implementation("com.google.accompanist:accompanist-navigation-animation:0.34.0")
+
+
+    //Api Noticias
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+// Coil para imágenes
+    implementation("io.coil-kt:coil-compose:2.2.2")
+
+// Swipe Refresh
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.31.3-beta")
 }

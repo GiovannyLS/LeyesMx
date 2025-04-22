@@ -13,40 +13,82 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.leyesmx.R
-import com.example.leyesmx.data.NoticiasProvider
+//import com.example.leyesmx.data.NoticiasProvider
 
+import com.example.leyesmx.model.Article
+import com.example.leyesmx.data.RetrofitClient
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import kotlinx.coroutines.launch
+import com.google.accompanist.swiperefresh.*
+import com.example.leyesmx.viewmodel.NoticiasViewModel
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.clickable
+
+
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NoticiasScreen() {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+fun NoticiasScreen(viewModel: NoticiasViewModel) {
+    val noticias by viewModel.noticias.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val uriHandler = LocalUriHandler.current
+    val scope = rememberCoroutineScope()
+
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = isLoading),
+        onRefresh = { viewModel.refrescar() }
     ) {
-        items(NoticiasProvider.noticias) { noticia ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                elevation = CardDefaults.cardElevation(4.dp)
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            items(noticias) { noticia ->
+                Card(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                        .clickable { uriHandler.openUri(noticia.url) },
+                    elevation = CardDefaults.cardElevation(4.dp)
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_noticias),
-                        contentDescription = "Ícono de noticias",
-                        modifier = Modifier
-                            .size(48.dp)
-                            .padding(end = 16.dp)
-                    )
-                    Column {
-                        Text(text = noticia.titulo, style = MaterialTheme.typography.titleMedium)
-                        Text(text = noticia.descripcion, style = MaterialTheme.typography.bodyMedium)
-                        Text(
-                            text = "Fuente: ${noticia.fuente} | ${noticia.fecha}",
-                            style = MaterialTheme.typography.labelSmall
+                    Row(modifier = Modifier.padding(8.dp)) {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                ImageRequest.Builder(LocalContext.current)
+                                    .data(noticia.urlToImage)
+                                    .crossfade(true)
+                                    .build()
+                            ),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(80.dp)
+                                .padding(end = 8.dp)
                         )
+                        Text(
+                            text = noticia.title,
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                        )
+                    }
+                }
+            }
+
+            item {
+                if (!isLoading) {
+                    Button(
+                        onClick = { viewModel.cargarNoticias() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Text("Cargar más noticias")
                     }
                 }
             }

@@ -1,6 +1,10 @@
 package com.example.leyesmx
 import com.example.leyesmx.screens.NoticiasScreen
 import com.example.leyesmx.ui.screens.InfoPantalla
+import com.example.leyesmx.viewmodel.NoticiasViewModel
+import com.example.leyesmx.data.NoticiasApi
+import com.example.leyesmx.repository.NoticiasRepository
+
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -25,6 +29,8 @@ import androidx.compose.animation.*
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.res.painterResource
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 
 class MainActivity : ComponentActivity() {
@@ -94,7 +100,21 @@ fun LeyesMxApp() {
                     icon = painterResource(id = R.drawable.ic_multas)
                 )
             }
-            composable("noticias") { NoticiasScreen() }
+            composable("noticias") {
+                val viewModel = remember {
+                    NoticiasViewModel(
+                        NoticiasRepository(
+                            Retrofit.Builder()
+                                .baseUrl("https://newsapi.org/v2/")
+                                .addConverterFactory(GsonConverterFactory.create())
+                                .build()
+                                .create(NoticiasApi::class.java),
+                            apiKey = "TU_API_KEY_AQUÍ"
+                        )
+                    )
+                }
+                NoticiasScreen(viewModel)
+            }
         }
     }
 }

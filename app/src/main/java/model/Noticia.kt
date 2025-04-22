@@ -1,10 +1,11 @@
 package com.example.leyesmx.model
 
 data class Noticia(
-    val id: Int,
-    val titulo: String,
-    val descripcion: String,
-    val fuente: String,
-    val fecha: String
+    val title: String,
+    val url: String,
+    val urlToImage: String?
 )
 
+data class NoticiasResponse(
+    val articles: List<Noticia>
+)
