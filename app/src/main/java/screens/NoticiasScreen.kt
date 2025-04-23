@@ -92,6 +92,8 @@ fun NoticiasScreen(viewModel: NoticiasViewModel) {
                     }
                 }
             }
+
+
         }
     }
 }

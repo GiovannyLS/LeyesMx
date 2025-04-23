@@ -116,4 +116,8 @@ dependencies {
 
 // Swipe Refresh
     implementation("com.google.accompanist:accompanist-swiperefresh:0.31.3-beta")
+
+    // Compose ViewModel
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+
 }

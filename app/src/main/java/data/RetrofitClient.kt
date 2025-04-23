@@ -1,10 +1,11 @@
 package com.example.leyesmx.data
 
+import  com.example.leyesmx.data.NoticiasApi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "https://newsapi.org/"
+    private const val BASE_URL = "https://newsapi.org/v2/"
 
     val apiService: NoticiasApi by lazy {
         Retrofit.Builder()

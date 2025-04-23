@@ -1,5 +1,6 @@
 package com.example.leyesmx.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.leyesmx.model.Noticia
@@ -32,14 +33,18 @@ class NoticiasViewModel(
                 currentPage++
             } catch (e: Exception) {
                 e.printStackTrace()
+                Log.e("NoticiasViewModel", "Error cargando noticias", e)
             }
             _isLoading.value = false
         }
     }
+
 
     fun refrescar() {
         currentPage = 1
         _noticias.value = emptyList()
         cargarNoticias()
     }
+
+
 }

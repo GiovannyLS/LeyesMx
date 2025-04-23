@@ -7,5 +7,6 @@ data class Noticia(
 )
 
 data class NoticiasResponse(
-    val articles: List<Noticia>
+    val articles: List<Article>
 )
+

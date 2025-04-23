@@ -2,7 +2,7 @@ package com.example.leyesmx
 import com.example.leyesmx.screens.NoticiasScreen
 import com.example.leyesmx.ui.screens.InfoPantalla
 import com.example.leyesmx.viewmodel.NoticiasViewModel
-import com.example.leyesmx.data.NoticiasApi
+import com.example.leyesmx.data.RetrofitClient
 import com.example.leyesmx.repository.NoticiasRepository
 
 
@@ -14,23 +14,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.*
 import com.example.leyesmx.ui.theme.LeyesMxTheme
-import androidx.navigation.NavGraphBuilder
 import androidx.compose.animation.*
 import androidx.compose.runtime.remember
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import androidx.compose.animation.ExperimentalAnimationApi
 import com.google.accompanist.navigation.animation.composable
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.animation.*
 import androidx.compose.ui.Alignment
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.res.painterResource
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 
 class MainActivity : ComponentActivity() {
@@ -104,17 +96,14 @@ fun LeyesMxApp() {
                 val viewModel = remember {
                     NoticiasViewModel(
                         NoticiasRepository(
-                            Retrofit.Builder()
-                                .baseUrl("https://newsapi.org/v2/")
-                                .addConverterFactory(GsonConverterFactory.create())
-                                .build()
-                                .create(NoticiasApi::class.java),
-                            apiKey = "TU_API_KEY_AQUÍ"
+                            RetrofitClient.apiService,
+                            apiKey = "5d75ab6751834c229230793d07cc17e5"
                         )
                     )
                 }
                 NoticiasScreen(viewModel)
             }
+
         }
     }
 }
