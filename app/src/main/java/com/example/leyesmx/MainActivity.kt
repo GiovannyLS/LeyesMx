@@ -4,6 +4,7 @@ import com.example.leyesmx.ui.screens.InfoPantalla
 import com.example.leyesmx.viewmodel.NoticiasViewModel
 import com.example.leyesmx.data.RetrofitClient
 import com.example.leyesmx.repository.NoticiasRepository
+import com.example.leyesmx.screens.ConstitucionScreen
 
 
 import android.os.Bundle
@@ -67,7 +68,7 @@ fun LeyesMxApp() {
             popExitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut() }
         ) {
             composable("menu") { MainMenu(navController) }
-            composable("constitucion") { Pantalla("Constitución Mexicana") }
+            composable("constitucion") { ConstitucionScreen() }
             composable("transito") { Pantalla("Reglamento de Tránsito") }
             composable("tenencia") {
                 InfoPantalla(
@@ -107,3 +108,4 @@ fun LeyesMxApp() {
         }
     }
 }
+
