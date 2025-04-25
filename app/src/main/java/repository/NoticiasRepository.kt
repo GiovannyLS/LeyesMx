@@ -22,6 +22,18 @@ class NoticiasRepository(
     }
 
 
+    suspend fun buscarNoticiasPorPalabraClave(query: String, page: Int): List<Noticia> {
+        val response = api.buscarNoticias(query = query, apiKey = apiKey, page = page)
+        return response.articles.map { article ->
+            Noticia(
+                title = article.title ?: "Sin título",
+                url = article.url ?: "",
+                urlToImage = article.urlToImage
+            )
+        }
+    }
+
+
 
 
 }

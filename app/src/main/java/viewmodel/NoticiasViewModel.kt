@@ -18,13 +18,24 @@ class NoticiasViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery
+
     private var currentPage = 1
+    private var isSearching = false
 
     init {
         cargarNoticias()
     }
 
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+        buscarNoticias(query)
+    }
+
     fun cargarNoticias() {
+        if (isSearching) return // No cargar más si estamos en búsqueda
+
         viewModelScope.launch {
             _isLoading.value = true
             try {
@@ -39,12 +50,34 @@ class NoticiasViewModel(
         }
     }
 
-
     fun refrescar() {
         currentPage = 1
         _noticias.value = emptyList()
-        cargarNoticias()
+        if (_searchQuery.value.isEmpty()) {
+            cargarNoticias()
+        } else {
+            buscarNoticias(_searchQuery.value)
+        }
     }
 
+    fun buscarNoticias(query: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            isSearching = query.isNotEmpty()
 
+            try {
+                val resultado = if (query.isNotEmpty()) {
+                    repository.buscarNoticiasPorPalabraClave(query, 1)
+                } else {
+                    repository.obtenerNoticias(1)
+                }
+                _noticias.value = resultado
+                currentPage = 2
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e("NoticiasViewModel", "Error buscando noticias", e)
+            }
+            _isLoading.value = false
+        }
+    }
 }
