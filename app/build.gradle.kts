@@ -71,12 +71,11 @@ dependencies {
     implementation("com.google.firebase:firebase-database-ktx:20.0.3")
     implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-firestore-ktx:25.1.4")
 
     // Navigation
     implementation("androidx.navigation:navigation-fragment-ktx:2.6.0")
     implementation("androidx.navigation:navigation-ui-ktx:2.6.0")
-
-    implementation(platform("androidx.compose:compose-bom:2024.03.00"))
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // Herramientas de depuración
