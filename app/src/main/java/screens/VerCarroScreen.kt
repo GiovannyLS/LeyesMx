@@ -6,45 +6,73 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.leyesmx.auth.FirebaseAuthManager
+import com.example.leyesmx.viewmodel.userViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import androidx.navigation.NavHostController
+
 
 @Composable
-fun VerCarroScreen() {
-    val auth = FirebaseAuthManager()
-    val userId = auth.obtenerUsuarioId()
-    var marca by remember { mutableStateOf("") }
-    var modelo by remember { mutableStateOf("") }
-    var placas by remember { mutableStateOf("") }
+fun VerCarroScreen(userViewModel: userViewModel, navController: NavHostController) {
+    val carro = userViewModel.carro
+    val usuario = userViewModel.usuario
 
-    LaunchedEffect(userId) {
-        if (userId != null) {
-            Firebase.firestore.collection("usuarios")
-                .document(userId)
-                .collection("carros")
-                .limit(1) // Solo uno por ahora
-                .get()
-                .addOnSuccessListener { docs ->
-                    if (!docs.isEmpty) {
-                        val doc = docs.documents[0]
-                        marca = doc.getString("marca") ?: ""
-                        modelo = doc.getString("modelo") ?: ""
-                        placas = doc.getString("placas") ?: ""
-                    }
-                }
-        }
-    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
-        verticalArrangement = Arrangement.Top
+        verticalArrangement = Arrangement.Center
     ) {
-        Text("Mi carro", style = MaterialTheme.typography.headlineSmall)
+        Text("Mi Vehículo", style = MaterialTheme.typography.headlineMedium)
+
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Marca: $marca")
-        Text("Modelo: $modelo")
-        Text("Placas: $placas")
+
+        if (usuario != null && usuario.carro != null) {
+            val carro = usuario.carro!!
+            Column {
+                Text("🚗 Carro registrado:")
+                Text("• Marca: ${carro.marca}")
+                Text("• Modelo: ${carro.modelo}")
+                Text("• Placas: ${carro.placas}")
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = {
+                        navController.navigate("registro_carro")
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Editar Información del Vehículo")
+                }
+            }
+        } else {
+            Column {
+                Text("🚫 Aún no has registrado un carro.")
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(onClick = {
+                    navController.navigate("registro_carro")
+                },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp)
+                ) {
+
+                    Text("Registrar Carro")
+                }
+            }
+        }
+
+
+        if (carro != null){
+            carro?.let {
+                Text("Marca: ${it.marca}")
+                Text("Modelo: ${it.modelo}")
+                Text("Placas: ${it.placas}")
+            } ?: run {
+                Text("No hay información del vehículo registrada.")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
     }
 }

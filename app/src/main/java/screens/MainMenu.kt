@@ -12,56 +12,75 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.leyesmx.R
+import com.example.leyesmx.viewmodel.userViewModel
+
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+
 
 @Composable
-fun MainMenu(navController: NavHostController) {
+fun MainMenu(navController: NavHostController, userViewModel: userViewModel) {
+    val usuario = userViewModel.usuario
+
     val items = listOf(
-        Triple("Constitución", R.drawable.ic_tenencia, "constitucion"),
-        Triple("Tránsito", R.drawable.ic_tenencia, "transito"),
+        Triple("Constitución", R.drawable.ic_constitucion, "constitucion"),
+        Triple("Tránsito", R.drawable.ic_transito, "transito"),
         Triple("Tenencia", R.drawable.ic_tenencia, "tenencia"),
         Triple("Verificación", R.drawable.ic_verificacion, "verificacion"),
         Triple("Multas", R.drawable.ic_multas, "multas"),
         Triple("Noticias", R.drawable.ic_noticias, "noticias")
     )
 
+    val colors = listOf(
+        MaterialTheme.colorScheme.primaryContainer,
+        MaterialTheme.colorScheme.secondaryContainer,
+        MaterialTheme.colorScheme.tertiaryContainer,
+        MaterialTheme.colorScheme.surfaceVariant,
+        MaterialTheme.colorScheme.inversePrimary,
+        MaterialTheme.colorScheme.primary
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items.chunked(2).forEach { rowItems ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+        Text(
+            text = "¡Bienvenido, ${usuario?.nombre ?: "Invitado"}!",
+            style = MaterialTheme.typography.headlineSmall
+        )
+
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        items.forEachIndexed { index, (title, icon, route) ->
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .clickable { navController.navigate(route) },
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = colors[index % colors.size]),
+                elevation = CardDefaults.cardElevation(6.dp)
             ) {
-                rowItems.forEach { (title, icon, route) ->
-                    Card(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable { navController.navigate(route) },
-                        shape = RoundedCornerShape(12.dp),
-                        elevation = CardDefaults.cardElevation(8.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Image(
-                                painter = painterResource(id = icon),
-                                contentDescription = title,
-                                modifier = Modifier.size(48.dp)
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(title, style = MaterialTheme.typography.titleMedium)
-                        }
-                    }
-                }
-                if (rowItems.size == 1) {
-                    Spacer(modifier = Modifier.weight(1f)) // para mantener equilibrio si es impar
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Image(
+                        painter = painterResource(id = icon),
+                        contentDescription = title,
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
             }
         }

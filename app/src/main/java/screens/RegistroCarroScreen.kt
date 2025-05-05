@@ -5,20 +5,20 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.leyesmx.auth.FirebaseAuthManager
 import com.example.leyesmx.data.FirebaseFirestoreManager
+import com.example.leyesmx.viewmodel.userViewModel
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun RegistroCarroScreen(
-    onRegistroExitoso: () -> Unit
-) {
-    val authManager = remember { FirebaseAuthManager() }
-    val firestoreManager = remember { FirebaseFirestoreManager() }
-
+fun RegistroCarroScreen(userViewModel: userViewModel, navController: NavHostController) {
     var marca by remember { mutableStateOf("") }
     var modelo by remember { mutableStateOf("") }
     var placas by remember { mutableStateOf("") }
-    var mensajeError by remember { mutableStateOf<String?>(null) }
+    var errorMsg by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier
@@ -26,30 +26,78 @@ fun RegistroCarroScreen(
             .padding(24.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Registrar carro", style = MaterialTheme.typography.headlineSmall)
+        Text("Registrar Vehículo", style = MaterialTheme.typography.headlineMedium)
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(value = marca, onValueChange = { marca = it }, label = { Text("Marca") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = modelo, onValueChange = { modelo = it }, label = { Text("Modelo") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = placas, onValueChange = { placas = it }, label = { Text("Placas") }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(
+            value = marca,
+            onValueChange = { marca = it },
+            label = { Text("Marca") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
 
-        mensajeError?.let {
-            Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = modelo,
+            onValueChange = { modelo = it },
+            label = { Text("Modelo") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = placas,
+            onValueChange = { placas = it },
+            label = { Text("Placas") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                if (marca.isNotBlank() && modelo.isNotBlank() && placas.isNotBlank()) {
+                    val currentUser = FirebaseAuth.getInstance().currentUser
+                    if (currentUser != null) {
+                        val uid = currentUser.uid
+                        val carroData = hashMapOf(
+                            "marca" to marca,
+                            "modelo" to modelo,
+                            "placas" to placas
+                        )
+                        Firebase.firestore.collection("carros").document(uid).set(carroData)
+                            .addOnSuccessListener {
+                                println("Vehículo registrado correctamente")
+                                userViewModel.registrarCarro(marca, modelo, placas)
+                                navController.navigate("ver_carro") {
+                                    popUpTo("registro_carro") { inclusive = true }
+                                }
+                            }
+                            .addOnFailureListener {
+                                println("Error al registrar vehículo: ${it.message}")
+                                errorMsg = "Error al guardar el vehículo. Intenta de nuevo."
+                            }
+                    } else {
+                        errorMsg = "Usuario no autenticado."
+                    }
+                } else {
+                    errorMsg = "Por favor, completa todos los campos."
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Registrar")
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = {
-            val userId = authManager.obtenerUsuarioId()
-            if (userId != null && marca.isNotBlank() && modelo.isNotBlank() && placas.isNotBlank()) {
-                firestoreManager.guardarCarro(userId, marca, modelo, placas)
-                onRegistroExitoso()
-            } else {
-                mensajeError = "Completa todos los campos o inicia sesión"
-            }
-        }, modifier = Modifier.fillMaxWidth()) {
-            Text("Registrar carro")
+        errorMsg?.let {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(it, color = MaterialTheme.colorScheme.error)
         }
     }
 }

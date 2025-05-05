@@ -1,52 +1,40 @@
 package com.example.leyesmx
-import com.example.leyesmx.screens.NoticiasScreen
-import com.example.leyesmx.ui.screens.InfoPantalla
-import com.example.leyesmx.viewmodel.NoticiasViewModel
-import com.example.leyesmx.data.RetrofitClient
-import com.example.leyesmx.repository.NoticiasRepository
-import com.example.leyesmx.screens.ConstitucionScreen
-import com.example.leyesmx.viewmodel.ConstitucionViewModel
-import com.example.leyesmx.viewmodel.TransitoViewModel
-import com.example.leyesmx.screens.TransitoScreen
-import com.example.leyesmx.screens.RegistroScreen
-import com.example.leyesmx.screens.RegistroCarroScreen
-import com.example.leyesmx.screens.PerfilUsuarioScreen
-import com.example.leyesmx.screens.VerCarroScreen
-import com.example.leyesmx.screens.MainMenu
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.example.leyesmx.ui.theme.LeyesMxTheme
 import androidx.compose.animation.*
-import androidx.compose.runtime.remember
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import androidx.compose.animation.ExperimentalAnimationApi
-import com.google.accompanist.navigation.animation.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.res.painterResource
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.leyesmx.R
+import androidx.navigation.compose.rememberNavController
+import com.example.leyesmx.data.RetrofitClient
+import com.example.leyesmx.repository.NoticiasRepository
+import com.example.leyesmx.screens.*
+import com.example.leyesmx.ui.screens.InfoPantalla
+import com.example.leyesmx.ui.theme.LeyesMxTheme
+import com.example.leyesmx.viewmodel.*
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
+import kotlinx.coroutines.launch
+import com.google.firebase.FirebaseApp
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         setContent {
             LeyesMxTheme {
                 LeyesMxApp()
@@ -61,28 +49,47 @@ fun LeyesMxApp() {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val userViewModel: userViewModel = viewModel()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
                 Text("Opciones", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleLarge)
-                NavigationDrawerItem(
-                    label = { Text("Perfil de Usuario") },
-                    selected = false,
-                    onClick = {
-                        scope.launch { drawerState.close() }
-                        navController.navigate("perfil_usuario")
-                    }
-                )
-                NavigationDrawerItem(
-                    label = { Text("Ver Carro") },
-                    selected = false,
-                    onClick = {
-                        scope.launch { drawerState.close() }
-                        navController.navigate("ver_carro")
-                    }
-                )
+
+                if (userViewModel.usuario == null) {
+                    NavigationDrawerItem(
+                        label = { Text("Iniciar Sesión") },
+                        selected = false,
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            navController.navigate("login")
+                        }
+                    )
+                } else {
+                    NavigationDrawerItem(
+                        label = { Text("Mi Cuenta: ${userViewModel.usuario?.nombre}") },
+                        selected = false,
+                        onClick = {}
+                    )
+                    NavigationDrawerItem(
+                        label = { Text("Ver Carro") },
+                        selected = false,
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            navController.navigate("ver_carro")
+                        }
+                    )
+                    NavigationDrawerItem(
+                        label = { Text("Cerrar Sesión") },
+                        selected = false,
+                        onClick = {
+                            userViewModel.logout()
+                            scope.launch { drawerState.close() }
+                            navController.navigate("menu")
+                        }
+                    )
+                }
             }
         }
     ) {
@@ -120,14 +127,16 @@ fun LeyesMxApp() {
                 popEnterTransition = { slideInHorizontally(initialOffsetX = { -1000 }) + fadeIn() },
                 popExitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut() }
             ) {
-                composable("menu") { MainMenu(navController) }
+                composable("menu") { MainMenu(navController, userViewModel) }
+
                 composable("constitucion") {
                     ConstitucionScreen(viewModel = ConstitucionViewModel())
                 }
-                composable("transito") {
 
+                composable("transito") {
                     TransitoScreen(viewModel = TransitoViewModel())
                 }
+
                 composable("tenencia") {
                     InfoPantalla(
                         titulo = "Pago de Tenencia",
@@ -151,6 +160,7 @@ fun LeyesMxApp() {
                         icon = painterResource(id = R.drawable.ic_multas)
                     )
                 }
+
                 composable("noticias") {
                     val viewModel = remember {
                         NoticiasViewModel(
@@ -163,9 +173,23 @@ fun LeyesMxApp() {
                     NoticiasScreen(viewModel)
                 }
 
+                // Login y gestión de usuario/carro
+                composable("login") {
+                    LoginScreen(navController, userViewModel)
+                }
+
+                composable("registro_carro") {
+                    RegistroCarroScreen(userViewModel, navController)
+                }
+
+                composable("ver_carro") {
+                    VerCarroScreen(userViewModel, navController)
+                }
+
+                composable("registro_usuario") {
+                    RegistroUsuarioScreen(navController)
+                }
             }
         }
     }
 }
-
-
