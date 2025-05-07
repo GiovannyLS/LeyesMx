@@ -12,6 +12,9 @@ import com.google.firebase.ktx.Firebase
 import androidx.navigation.NavHostController
 
 
+import androidx.compose.runtime.Composable
+
+
 @Composable
 fun VerCarroScreen(userViewModel: userViewModel, navController: NavHostController) {
     val carro = userViewModel.carro
@@ -25,6 +28,8 @@ fun VerCarroScreen(userViewModel: userViewModel, navController: NavHostControlle
         verticalArrangement = Arrangement.Center
     ) {
         Text("Mi Vehículo", style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Spacer(modifier = Modifier.height(16.dp))
 

@@ -11,6 +11,7 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
 dependencyResolutionManagement {
     repositories {
         google()
@@ -20,4 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "LeyesMx"
 include(":app")
- 
