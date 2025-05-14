@@ -41,6 +41,10 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.0" // Asegúrate que coincida con tu versión Compose
     }
+    androidResources {
+        noCompress += "glb"
+    }
+
 }
 
 dependencies {
@@ -53,6 +57,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -110,6 +115,15 @@ dependencies {
         androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
         androidTestImplementation(platform(libs.androidx.compose.bom))
         androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+
+        // 3D
+        implementation ("io.github.sceneview:sceneview:1.1.0")
+        implementation("io.github.sceneview:sceneview:0.10.2")
+
+        //Google Maps
+        implementation("com.google.android.gms:play-services-maps:18.2.0")
+        implementation("com.google.maps.android:maps-compose:2.11.4")
+        implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
 
 

@@ -14,6 +14,8 @@ import com.google.firebase.auth.FirebaseAuth
 class userViewModel : ViewModel() {
     var usuario: Usuario? by mutableStateOf(null)
     var carro: Carro? by mutableStateOf(null)
+    val tenenciaPagada: Boolean?
+        get() = usuario?.carro?.tenenciaPagada
 
     fun login(uid: String, nombre: String, email: String, carro: Carro? = null) {
         usuario = Usuario(

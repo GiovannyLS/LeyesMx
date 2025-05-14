@@ -27,7 +27,6 @@ fun MainMenu(navController: NavHostController, userViewModel: userViewModel) {
         Triple("Tránsito", R.drawable.ic_transito, "transito"),
         Triple("Tenencia", R.drawable.ic_tenencia, "tenencia"),
         Triple("Verificación", R.drawable.ic_verificacion, "verificacion"),
-        Triple("Multas", R.drawable.ic_multas, "multas"),
         Triple("Noticias", R.drawable.ic_noticias, "noticias")
     )
 

@@ -22,6 +22,12 @@ fun RegistroUsuarioScreen(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
 
+    val usuario = hashMapOf(
+        "nombre" to nombre,
+        "correo" to correo
+    )
+
+
 
     Column(
         modifier = Modifier
@@ -70,27 +76,38 @@ fun RegistroUsuarioScreen(navController: NavController) {
                     auth.createUserWithEmailAndPassword(correo, contrasena)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                val userId = auth.currentUser?.uid ?: ""
-                                val usuario = hashMapOf(
-                                    "nombre" to nombre,
-                                    "correo" to correo
-                                )
-                                db.collection("usuarios").document(userId)
-                                    .set(usuario)
-                                    .addOnSuccessListener {
-                                        mensaje = "Registro exitoso"
-                                        cargando = false
-                                        navController.navigate("login")
-                                    }
-                                    .addOnFailureListener {
-                                        mensaje = "Error al guardar en Firestore"
-                                        cargando = false
-                                    }
+                                val user = auth.currentUser
+                                val userId = auth.currentUser?.uid
+
+
+
+                                if (userId != null) {
+                                    val usuario = hashMapOf(
+                                        "nombre" to nombre,
+                                        "correo" to correo,
+                                        "contrasena" to contrasena
+                                    )
+                                    db.collection("usuarios").document(userId)
+                                        .set(usuario)
+                                        .addOnSuccessListener {
+                                            mensaje = "Registro exitoso"
+                                            cargando = false
+                                            navController.navigate("login")
+                                        }
+                                        .addOnFailureListener { e ->
+                                            mensaje = "Error al guardar en Firestore: ${e.message}"
+                                            cargando = false
+                                        }
+                                } else {
+                                    mensaje = "Error: usuario no disponible después del registro"
+                                    cargando = false
+                                }
                             } else {
                                 mensaje = "Error: ${task.exception?.message}"
                                 cargando = false
                             }
                         }
+
                 } else {
                     mensaje = "Completa todos los campos"
                 }

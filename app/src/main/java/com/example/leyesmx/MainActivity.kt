@@ -146,11 +146,7 @@ fun LeyesMxApp() {
                 }
 
                 composable("verificacion") {
-                    InfoPantalla(
-                        titulo = "Verificación Vehicular",
-                        descripcion = "La verificación es obligatoria para reducir emisiones contaminantes. Consulta tu calendario y verifica tu vehículo según tu terminación de placa.",
-                        icon = painterResource(id = R.drawable.ic_verificacion)
-                    )
+                    VerificacionScreen(userViewModel)
                 }
 
                 composable("multas") {
