@@ -1,5 +1,6 @@
 package com.example.leyesmx
 
+import MiCuentaScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -70,7 +71,11 @@ fun LeyesMxApp() {
                     NavigationDrawerItem(
                         label = { Text("Mi Cuenta: ${userViewModel.usuario?.nombre}") },
                         selected = false,
-                        onClick = {}
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            navController.navigate("mi_cuenta")
+                        }
+
                     )
                     NavigationDrawerItem(
                         label = { Text("Ver Carro") },
@@ -137,12 +142,8 @@ fun LeyesMxApp() {
                     TransitoScreen(viewModel = TransitoViewModel())
                 }
 
-                composable("tenencia") {
-                    InfoPantalla(
-                        titulo = "Pago de Tenencia",
-                        descripcion = "La tenencia es un impuesto que se paga anualmente por el uso de vehículos. Se puede pagar en línea o en las oficinas de finanzas de tu estado.",
-                        icon = painterResource(id = R.drawable.ic_tenencia)
-                    )
+                composable("tienda") {
+                    TiendaScreen()
                 }
 
                 composable("verificacion") {
@@ -180,6 +181,9 @@ fun LeyesMxApp() {
 
                 composable("ver_carro") {
                     VerCarroScreen(userViewModel, navController)
+                }
+                composable("mi_cuenta") {
+                    MiCuentaScreen(userViewModel, navController)
                 }
 
                 composable("registro_usuario") {

@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.regex.Pattern
 
 @Composable
 fun RegistroUsuarioScreen(navController: NavController) {
@@ -21,6 +22,11 @@ fun RegistroUsuarioScreen(navController: NavController) {
 
     val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
+
+    var correoError by remember { mutableStateOf(false) }
+    var contrasenaError by remember { mutableStateOf(false) }
+    val esCorreoValido = android.util.Patterns.EMAIL_ADDRESS.matcher(correo).matches()
+    val esContrasenaSegura = Pattern.compile("^(?=.*[A-Z])(?=.*\\d)(?=.*[@#\$%^&+=!]).{8,}\$").matcher(contrasena).matches()
 
     val usuario = hashMapOf(
         "nombre" to nombre,
@@ -51,36 +57,68 @@ fun RegistroUsuarioScreen(navController: NavController) {
 
         OutlinedTextField(
             value = correo,
-            onValueChange = { correo = it },
+            onValueChange = {
+                correo = it
+                correoError = !android.util.Patterns.EMAIL_ADDRESS.matcher(it).matches()
+            },
             label = { Text("Correo electrónico") },
+            isError = correoError,
             modifier = Modifier.fillMaxWidth()
         )
+        if (correoError) {
+            Text("Correo inválido", color = MaterialTheme.colorScheme.error)
+        }
 
         Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
             value = contrasena,
-            onValueChange = { contrasena = it },
+            onValueChange = {
+                contrasena = it
+                contrasenaError = !Pattern.compile("^(?=.*[A-Z])(?=.*\\d)(?=.*[@#\$%^&+=!]).{8,}\$")
+                    .matcher(it).matches()
+            },
             label = { Text("Contraseña") },
             visualTransformation = PasswordVisualTransformation(),
+            isError = contrasenaError,
             modifier = Modifier.fillMaxWidth()
         )
+        if (contrasenaError) {
+            Text(
+                "Debe tener al menos 8 caracteres, una mayúscula, un número y un símbolo.",
+                color = MaterialTheme.colorScheme.error
+            )
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
             onClick = {
-                if (nombre.isNotBlank() && correo.isNotBlank() && contrasena.isNotBlank()) {
+
+                if (nombre.isBlank() || correo.isBlank() || contrasena.isBlank()) {
+                    mensaje = "Completa todos los campos"
+                    return@Button
+                }
+
+                if (!esCorreoValido) {
+                    mensaje = "Correo electrónico inválido"
+                    return@Button
+                }
+
+                if (!esContrasenaSegura) {
+                    mensaje = "Contraseña insegura"
+                    return@Button
+                }
+
                     cargando = true
                     mensaje = ""
+
+
+
                     auth.createUserWithEmailAndPassword(correo, contrasena)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                val user = auth.currentUser
                                 val userId = auth.currentUser?.uid
-
-
-
                                 if (userId != null) {
                                     val usuario = hashMapOf(
                                         "nombre" to nombre,
@@ -107,10 +145,6 @@ fun RegistroUsuarioScreen(navController: NavController) {
                                 cargando = false
                             }
                         }
-
-                } else {
-                    mensaje = "Completa todos los campos"
-                }
             },
             modifier = Modifier.fillMaxWidth(),
             enabled = !cargando

@@ -25,7 +25,7 @@ fun MainMenu(navController: NavHostController, userViewModel: userViewModel) {
     val items = listOf(
         Triple("Constitución", R.drawable.ic_constitucion, "constitucion"),
         Triple("Tránsito", R.drawable.ic_transito, "transito"),
-        Triple("Tenencia", R.drawable.ic_tenencia, "tenencia"),
+        Triple("Tienda", R.drawable.ic_transito, "tienda"),
         Triple("Verificación", R.drawable.ic_verificacion, "verificacion"),
         Triple("Noticias", R.drawable.ic_noticias, "noticias")
     )

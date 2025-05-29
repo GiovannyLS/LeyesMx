@@ -98,8 +98,8 @@ fun VerificacionScreen(userViewModel: userViewModel) {
 
         when (tenenciaPagada) {
             true -> {
-                Text("✅ Tenencia pagada. Puedes verificar.")
-                Text("📍 Verificentros cercanos:")
+                Text("Tenencia pagada. Puedes verificar.")
+                Text("Verificentros cercanos:")
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -120,12 +120,6 @@ fun VerificacionScreen(userViewModel: userViewModel) {
                                 position = CameraPosition.fromLatLngZoom(userLocation, 12f)
                             }
                         ) {
-                            Marker(
-                                state = MarkerState(position = userLocation),
-                                title = "Tú estás aquí",
-                                snippet = "Ubicación actual"
-                            )
-
                             cercanos.forEach { (pos, nombre) ->
                                 Marker(
                                     state = MarkerState(position = pos),

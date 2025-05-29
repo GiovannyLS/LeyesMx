@@ -11,6 +11,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
 
 
+
 class userViewModel : ViewModel() {
     var usuario: Usuario? by mutableStateOf(null)
     var carro: Carro? by mutableStateOf(null)
@@ -59,4 +60,26 @@ class userViewModel : ViewModel() {
     fun setUsuario(uid: String, nombre: String, email: String, carro: Carro?) {
         usuario = Usuario(uid = uid, nombre = nombre, email = email, carro = carro)
     }
+
+    fun actualizarCarro(marca: String, modelo: String, placas: String) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val carroActualizado = Carro(marca, modelo, placas)
+
+        FirebaseFirestore.getInstance()
+            .collection("usuarios")
+            .document(uid)
+            .update("carro", hashMapOf(
+                "marca" to marca,
+                "modelo" to modelo,
+                "placas" to placas
+            ))
+            .addOnSuccessListener {
+                carro = carroActualizado
+                usuario = usuario?.copy(carro = carroActualizado)
+            }
+    }
+    fun actualizarNombre(nuevoNombre: String) {
+        usuario = usuario?.copy(nombre = nuevoNombre)
+    }
+
 }

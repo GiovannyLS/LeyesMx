@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.play.services.location)
+    implementation(libs.firebase.crashlytics.buildtools)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -100,7 +101,6 @@ dependencies {
         implementation("com.squareup.retrofit2:converter-gson:2.9.0")
         implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
         implementation("io.coil-kt:coil-compose:2.4.0")
-        implementation ("com.squareup.retrofit2:retrofit:2.9.0")
 
         // Swipe Refresh
         implementation("com.google.accompanist:accompanist-swiperefresh:0.31.3-beta")
@@ -124,6 +124,16 @@ dependencies {
         implementation("com.google.android.gms:play-services-maps:18.2.0")
         implementation("com.google.maps.android:maps-compose:2.11.4")
         implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+
+        //MercadoLibre
+        implementation("io.ktor:ktor-client-core:2.3.0")
+        implementation("io.ktor:ktor-client-cio:2.3.0")
+        implementation("io.ktor:ktor-client-json:2.3.0")
+        implementation("io.ktor:ktor-client-content-negotiation:2.3.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+
+        implementation("androidx.compose.animation:animation")
+
 
 
 
