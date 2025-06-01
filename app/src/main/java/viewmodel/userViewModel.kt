@@ -65,14 +65,16 @@ class userViewModel : ViewModel() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val carroActualizado = Carro(marca, modelo, placas)
 
+        val carroMap = mapOf(
+            "marca" to marca,
+            "modelo" to modelo,
+            "placas" to placas
+        )
+
         FirebaseFirestore.getInstance()
-            .collection("usuarios")
+            .collection("carros")
             .document(uid)
-            .update("carro", hashMapOf(
-                "marca" to marca,
-                "modelo" to modelo,
-                "placas" to placas
-            ))
+            .update(carroMap)
             .addOnSuccessListener {
                 carro = carroActualizado
                 usuario = usuario?.copy(carro = carroActualizado)

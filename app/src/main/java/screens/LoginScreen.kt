@@ -14,6 +14,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.example.leyesmx.model.Carro
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 
 @Composable
 fun LoginScreen(navController: NavController, userViewModel: userViewModel) {
@@ -25,124 +27,160 @@ fun LoginScreen(navController: NavController, userViewModel: userViewModel) {
     val auth = FirebaseAuth.getInstance()
     val db = Firebase.firestore
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
     ) {
-        Text("Iniciar Sesión", style = MaterialTheme.typography.headlineSmall)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Logo o encabezado visual
+            Icon(
+                imageVector = Icons.Default.Lock,
+                contentDescription = "Icono de seguridad",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .size(64.dp)
+                    .padding(bottom = 16.dp)
+            )
 
-        Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                text = "Bienvenido a LeyesMX",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
 
-        OutlinedTextField(
-            value = correo,
-            onValueChange = { correo = it },
-            label = { Text("Correo electrónico") },
-            modifier = Modifier.fillMaxWidth()
-        )
+            Text(
+                text = "Inicia sesión para continuar",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp, bottom = 32.dp)
+            )
 
-        Spacer(modifier = Modifier.height(12.dp))
+            OutlinedTextField(
+                value = correo,
+                onValueChange = { correo = it },
+                label = { Text("Correo electrónico") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        OutlinedTextField(
-            value = contrasena,
-            onValueChange = { contrasena = it },
-            label = { Text("Contraseña") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
-        )
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(24.dp))
+            OutlinedTextField(
+                value = contrasena,
+                onValueChange = { contrasena = it },
+                label = { Text("Contraseña") },
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        Button(
-            onClick = {
-                if (correo.isNotBlank() && contrasena.isNotBlank()) {
-                    cargando = true
-                    error = null
-                    auth.signInWithEmailAndPassword(correo.trim(), contrasena)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                val uid = auth.currentUser?.uid
-                                if (uid != null) {
-                                    // Obtener datos del usuario
-                                    db.collection("usuarios").document(uid).get()
-                                        .addOnSuccessListener { userDoc ->
-                                            val nombre = userDoc.getString("nombre") ?: "Usuario"
-                                            val email = userDoc.getString("correo") ?: correo
+            Spacer(modifier = Modifier.height(24.dp))
 
-                                            // Obtener datos del carro
-                                            db.collection("carros").document(uid).get()
-                                                .addOnSuccessListener { carroDoc ->
-                                                    val carro = if (carroDoc.exists()) {
-                                                        Carro(
-                                                            marca = carroDoc.getString("marca") ?: "",
-                                                            modelo = carroDoc.getString("modelo") ?: "",
-                                                            placas = carroDoc.getString("placas") ?: ""
-                                                        )
-                                                    } else null
+            Button(
+                onClick = {
+                    if (correo.isNotBlank() && contrasena.isNotBlank()) {
+                        cargando = true
+                        error = null
 
-                                                    // Guardar todo en el viewModel
-                                                    userViewModel.login(uid, nombre, email, carro)
-                                                    cargando = false
-                                                    navController.navigate("menu") {
-                                                        popUpTo("login") { inclusive = true }
+                        auth.signInWithEmailAndPassword(correo.trim(), contrasena)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    val uid = auth.currentUser?.uid
+                                    if (uid != null) {
+                                        db.collection("usuarios").document(uid).get()
+                                            .addOnSuccessListener { userDoc ->
+                                                val nombre = userDoc.getString("nombre") ?: "Usuario"
+                                                val email = userDoc.getString("correo") ?: correo
+
+                                                db.collection("carros").document(uid).get()
+                                                    .addOnSuccessListener { carroDoc ->
+                                                        val carro = if (carroDoc.exists()) {
+                                                            Carro(
+                                                                marca = carroDoc.getString("marca") ?: "",
+                                                                modelo = carroDoc.getString("modelo") ?: "",
+                                                                placas = carroDoc.getString("placas") ?: ""
+                                                            )
+                                                        } else null
+
+                                                        userViewModel.login(uid, nombre, email, carro)
+                                                        cargando = false
+                                                        navController.navigate("menu") {
+                                                            popUpTo("login") { inclusive = true }
+                                                        }
                                                     }
-                                                }
-                                                .addOnFailureListener {
-                                                    // Si falla carro, aún así continúa
-                                                    userViewModel.setUsuario(uid, nombre, email, null)
-                                                    cargando = false
-                                                    navController.navigate("menu") {
-                                                        popUpTo("login") { inclusive = true }
+                                                    .addOnFailureListener {
+                                                        userViewModel.setUsuario(uid, nombre, email, null)
+                                                        cargando = false
+                                                        navController.navigate("menu") {
+                                                            popUpTo("login") { inclusive = true }
+                                                        }
                                                     }
-                                                }
-                                        }
-                                        .addOnFailureListener {
-                                            error = "No se pudo obtener la información del usuario"
-                                            cargando = false
-                                        }
+                                            }
+                                            .addOnFailureListener {
+                                                error = "No se pudo obtener los datos del usuario"
+                                                cargando = false
+                                            }
+                                    } else {
+                                        error = "Error al obtener ID de usuario"
+                                        cargando = false
+                                    }
                                 } else {
-                                    error = "Error al obtener UID del usuario"
+                                    error = "Correo o contraseña incorrectos"
                                     cargando = false
                                 }
-                            } else {
-                                error = "Correo o contraseña incorrectos"
-                                cargando = false
                             }
-                        }
+                    } else {
+                        error = "Por favor completa todos los campos"
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = MaterialTheme.shapes.medium,
+                enabled = !cargando
+            ) {
+                if (cargando) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Ingresando...")
                 } else {
-                    error = "Completa todos los campos"
+                    Text("Ingresar", style = MaterialTheme.typography.labelLarge)
                 }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !cargando
-        ) {
-            if (cargando) {
-                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Ingresando...")
-            } else {
-                Text("Ingresar")
             }
-        }
 
-        error?.let {
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(it, color = MaterialTheme.colorScheme.error)
-        }
+            error?.let {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-        Row {
-            Text("¿No tienes cuenta? ")
-            Text(
-                text = "Regístrate aquí",
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.clickable {
-                    navController.navigate("registro_usuario")
-                }
-            )
+            Row {
+                Text("¿No tienes cuenta?", color = MaterialTheme.colorScheme.onSurface)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "Regístrate",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.clickable {
+                        navController.navigate("registro_usuario")
+                    }
+                )
+            }
         }
     }
 }

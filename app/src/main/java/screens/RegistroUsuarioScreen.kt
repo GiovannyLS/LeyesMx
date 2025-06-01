@@ -14,26 +14,24 @@ import java.util.regex.Pattern
 
 @Composable
 fun RegistroUsuarioScreen(navController: NavController) {
+    // Estado de campos de entrada
     var nombre by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
     var contrasena by remember { mutableStateOf("") }
+
+    // Validaciones y mensajes
     var mensaje by remember { mutableStateOf("") }
     var cargando by remember { mutableStateOf(false) }
+    var correoError by remember { mutableStateOf(false) }
+    var contrasenaError by remember { mutableStateOf(false) }
 
+    // Firebase
     val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
 
-    var correoError by remember { mutableStateOf(false) }
-    var contrasenaError by remember { mutableStateOf(false) }
     val esCorreoValido = android.util.Patterns.EMAIL_ADDRESS.matcher(correo).matches()
-    val esContrasenaSegura = Pattern.compile("^(?=.*[A-Z])(?=.*\\d)(?=.*[@#\$%^&+=!]).{8,}\$").matcher(contrasena).matches()
-
-    val usuario = hashMapOf(
-        "nombre" to nombre,
-        "correo" to correo
-    )
-
-
+    val esContrasenaSegura = Pattern.compile("^(?=.*[A-Z])(?=.*\\d)(?=.*[@#\$%^&+=!]).{8,}$")
+        .matcher(contrasena).matches()
 
     Column(
         modifier = Modifier
@@ -42,7 +40,7 @@ fun RegistroUsuarioScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Crear Cuenta", style = MaterialTheme.typography.headlineSmall)
+        Text("Crear cuenta en LeyesMX", style = MaterialTheme.typography.headlineSmall)
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -66,7 +64,7 @@ fun RegistroUsuarioScreen(navController: NavController) {
             modifier = Modifier.fillMaxWidth()
         )
         if (correoError) {
-            Text("Correo inválido", color = MaterialTheme.colorScheme.error)
+            Text("Formato de correo inválido", color = MaterialTheme.colorScheme.error)
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -75,7 +73,7 @@ fun RegistroUsuarioScreen(navController: NavController) {
             value = contrasena,
             onValueChange = {
                 contrasena = it
-                contrasenaError = !Pattern.compile("^(?=.*[A-Z])(?=.*\\d)(?=.*[@#\$%^&+=!]).{8,}\$")
+                contrasenaError = !Pattern.compile("^(?=.*[A-Z])(?=.*\\d)(?=.*[@#\$%^&+=!]).{8,}$")
                     .matcher(it).matches()
             },
             label = { Text("Contraseña") },
@@ -94,63 +92,65 @@ fun RegistroUsuarioScreen(navController: NavController) {
 
         Button(
             onClick = {
-
                 if (nombre.isBlank() || correo.isBlank() || contrasena.isBlank()) {
-                    mensaje = "Completa todos los campos"
+                    mensaje = "Por favor, completa todos los campos."
                     return@Button
                 }
 
                 if (!esCorreoValido) {
-                    mensaje = "Correo electrónico inválido"
+                    mensaje = "Correo electrónico inválido."
                     return@Button
                 }
 
                 if (!esContrasenaSegura) {
-                    mensaje = "Contraseña insegura"
+                    mensaje = "Contraseña insegura."
                     return@Button
                 }
 
-                    cargando = true
-                    mensaje = ""
+                cargando = true
+                mensaje = ""
 
-
-
-                    auth.createUserWithEmailAndPassword(correo, contrasena)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                val userId = auth.currentUser?.uid
-                                if (userId != null) {
-                                    val usuario = hashMapOf(
-                                        "nombre" to nombre,
-                                        "correo" to correo,
-                                        "contrasena" to contrasena
-                                    )
-                                    db.collection("usuarios").document(userId)
-                                        .set(usuario)
-                                        .addOnSuccessListener {
-                                            mensaje = "Registro exitoso"
-                                            cargando = false
-                                            navController.navigate("login")
+                auth.createUserWithEmailAndPassword(correo, contrasena)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val userId = auth.currentUser?.uid
+                            if (userId != null) {
+                                val usuario = hashMapOf(
+                                    "nombre" to nombre,
+                                    "correo" to correo
+                                )
+                                db.collection("usuarios").document(userId)
+                                    .set(usuario)
+                                    .addOnSuccessListener {
+                                        mensaje = "Registro exitoso. Inicia sesión para continuar."
+                                        cargando = false
+                                        navController.navigate("login") {
+                                            popUpTo("registro_usuario") { inclusive = true }
                                         }
-                                        .addOnFailureListener { e ->
-                                            mensaje = "Error al guardar en Firestore: ${e.message}"
-                                            cargando = false
-                                        }
-                                } else {
-                                    mensaje = "Error: usuario no disponible después del registro"
-                                    cargando = false
-                                }
+                                    }
+                                    .addOnFailureListener { e ->
+                                        mensaje = "Error al guardar datos: ${e.message}"
+                                        cargando = false
+                                    }
                             } else {
-                                mensaje = "Error: ${task.exception?.message}"
+                                mensaje = "No se pudo obtener el ID del usuario."
                                 cargando = false
                             }
+                        } else {
+                            mensaje = task.exception?.localizedMessage
+                                ?: "Error al registrar usuario."
+                            cargando = false
                         }
+                    }
             },
             modifier = Modifier.fillMaxWidth(),
             enabled = !cargando
         ) {
             if (cargando) {
-                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Registrando...")
             } else {
@@ -159,7 +159,7 @@ fun RegistroUsuarioScreen(navController: NavController) {
         }
 
         if (mensaje.isNotBlank()) {
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(mensaje, color = MaterialTheme.colorScheme.primary)
         }
     }

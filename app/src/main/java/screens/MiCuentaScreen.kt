@@ -28,60 +28,91 @@ fun MiCuentaScreen(userViewModel: userViewModel, navController: NavController) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Mi Cuenta", style = MaterialTheme.typography.headlineSmall)
-        Spacer(modifier = Modifier.height(20.dp))
-
-        OutlinedTextField(
-            value = nombre,
-            onValueChange = { nombre = it },
-            label = { Text("Nombre completo") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedTextField(
-            value = usuario?.email ?: "",
-            onValueChange = {},
-            label = { Text("Correo electrónico") },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = false
+        Text(
+            text = "Mi Cuenta",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.primary
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(
-            onClick = {
-                if (uid != null) {
-                    cargando = true
-                    db.collection("usuarios").document(uid)
-                        .update("nombre", nombre)
-                        .addOnSuccessListener {
-                            userViewModel.actualizarNombre(nombre)
-                            mensaje = "Datos actualizados correctamente"
-                            cargando = false
-                        }
-                        .addOnFailureListener {
-                            mensaje = "Error al actualizar: ${it.message}"
-                            cargando = false
-                        }
-                }
-            },
-            enabled = !cargando,
-            modifier = Modifier.fillMaxWidth()
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.extraLarge,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            ),
+            elevation = CardDefaults.cardElevation(4.dp)
         ) {
-            if (cargando) {
-                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Guardando...")
-            } else {
-                Text("Guardar cambios")
-            }
-        }
+            Column(
+                modifier = Modifier.padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "Editar perfil",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.secondary
+                )
 
-        if (mensaje.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(mensaje, color = MaterialTheme.colorScheme.primary)
+                OutlinedTextField(
+                    value = nombre,
+                    onValueChange = { nombre = it },
+                    label = { Text("Nombre completo") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = usuario?.email ?: "",
+                    onValueChange = {},
+                    label = { Text("Correo electrónico") },
+                    singleLine = true,
+                    enabled = false,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Button(
+                    onClick = {
+                        if (uid != null) {
+                            cargando = true
+                            db.collection("usuarios").document(uid)
+                                .update("nombre", nombre)
+                                .addOnSuccessListener {
+                                    userViewModel.actualizarNombre(nombre)
+                                    mensaje = "✅ Datos actualizados correctamente"
+                                    cargando = false
+                                }
+                                .addOnFailureListener {
+                                    mensaje = "❌ Error al actualizar: ${it.message}"
+                                    cargando = false
+                                }
+                        }
+                    },
+                    enabled = !cargando,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (cargando) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Guardando...")
+                    } else {
+                        Text("Guardar cambios")
+                    }
+                }
+
+                if (mensaje.isNotEmpty()) {
+                    Text(
+                        text = mensaje,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (mensaje.startsWith("✅")) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         }
     }
 }
