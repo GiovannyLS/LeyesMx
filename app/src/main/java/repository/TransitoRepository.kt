@@ -1,11 +1,13 @@
 package com.example.leyesmx.repository
 
 import com.example.leyesmx.data.TransitoRetrofitClient
-import com.example.leyesmx.model.ArticuloTransito
+import com.example.leyesmx.model.ReglamentoEstado
 
-class TransitoRepository{
 
-    suspend fun obtenerArticulosTransito(): List<ArticuloTransito>{
-        return  TransitoRetrofitClient.api.obtenerArticulosTransito()
+class TransitoRepository {
+
+    suspend fun obtenerReglamento(): ReglamentoEstado {
+        return TransitoRetrofitClient.api.obtenerReglamento()
     }
-}
+
+    }

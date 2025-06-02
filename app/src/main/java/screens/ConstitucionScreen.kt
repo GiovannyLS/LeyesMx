@@ -24,7 +24,6 @@ fun ConstitucionScreen(viewModel: ConstitucionViewModel) {
     val articulos = viewModel.articulos.collectAsState().value
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
 
-    // Agrupar artículos por título/sección
     val groupedArticulos = articulos
         .filter {
             it.titulo.contains(searchText.text, ignoreCase = true) ||
